@@ -1,0 +1,157 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  *::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: #ef444457;
+    opacity: 0.5;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background-color: #ef4444;
+    border: 3px solid #ef4444;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply min-w-[220px] border-2 p-2 text-base font-extrabold uppercase backdrop-blur-[2px] transition-all duration-200;
+    clip-path: polygon(100% 0, 100% 52%, 90.5% 100%, 0 100%, 0 0);
+  }
+
+  .x-btn {
+    @apply w-[50px] border-2 p-2 text-base font-extrabold uppercase backdrop-blur-[2px] transition-all duration-200;
+    clip-path: polygon(0 0, 100% 0, 100% 75%, 75% 100%, 0 100%, 0% 50%);
+  }
+
+  .btn:disabled {
+    @apply opacity-50;
+  }
+
+  .btn::after {
+    @apply absolute bottom-[-14px] right-[-14px] h-[28px] w-[28px] rotate-[135deg] border-b-2 border-solid transition-all duration-200 content-[''] focus:outline-cp-cyan;
+  }
+
+  .x-btn::after {
+    @apply absolute bottom-[-15.5px] right-[-13px] h-[24px] w-[20px] rotate-[139deg] border-b-2 border-solid transition-all duration-200 content-[''] focus:outline-cp-cyan;
+  }
+
+  .btn-cyan {
+    @apply border-cp-cyan  text-cp-cyan;
+  }
+
+  .btn-cyan::after {
+    @apply border-cp-cyan;
+  }
+
+  .btn-red {
+    @apply border-cp-red text-cp-red;
+  }
+
+  .btn-red::after {
+    @apply border-cp-red;
+  }
+
+  .btn-yellow {
+    @apply border-cp-yellow text-cp-yellow;
+  }
+
+  .btn-yellow::after {
+    @apply border-cp-yellow;
+  }
+
+  .btn-green {
+    @apply border-cp-green text-cp-green;
+  }
+
+  .btn-green::after {
+    @apply border-cp-green;
+  }
+
+  .btn-menu {
+    @apply border border-transparent p-2 text-start font-bold uppercase text-white transition-all duration-200 xs:text-lg md:text-2xl;
+  }
+
+  .light-silver-shadow {
+    @apply shadow-[-8px_-2px_20px_#ccdaf0];
+  }
+
+  .mission-button {
+    @apply relative border-2 p-4 text-start;
+  }
+
+  .slider {
+    @apply block h-6 w-8 -skew-x-12 bg-cp-yellow ring-offset-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cp-red disabled:pointer-events-none disabled:opacity-50;
+  }
+
+  .modal-cyan {
+    @apply gradient-cp-cyan border-cp-cyan shadow-[0_0_12px_#34d0ff];
+  }
+
+  .modal-red {
+    @apply border-cp-red bg-gradient-to-b from-red-950 via-black to-black shadow-[0_0_12px_#ef4444];
+  }
+
+  /* Gradients */
+
+  .gradient-cp {
+    background-color: rgb(0, 0, 0);
+    background-image: radial-gradient(
+        at 34% 57%,
+        rgb(136, 19, 55) 0,
+        transparent 3%
+      ),
+      radial-gradient(at 83% 27%, rgb(0, 0, 0) 0, transparent 50%),
+      radial-gradient(at 85% 7%, rgb(136, 19, 55) 0, transparent 2%),
+      radial-gradient(at 21% 39%, rgb(127, 29, 29) 0, transparent 20%),
+      radial-gradient(at 69% 57%, rgb(127, 29, 29) 0, transparent 23%);
+  }
+
+  .gradient-cp-red {
+    @apply bg-gradient-to-t from-red-900 via-red-600 to-red-900;
+  }
+
+  .gradient-cp-red-2 {
+    background-color: rgb(0, 0, 0);
+    background-image: radial-gradient(
+        at 20% 50%,
+        rgb(127, 29, 29) 0,
+        transparent 42%
+      ),
+      radial-gradient(at 80% 50%, rgb(127, 29, 29) 0, transparent 42%),
+      radial-gradient(at 50% 50%, rgb(127, 29, 29) 0, transparent 42%);
+  }
+
+  .gradient-cp-red-3 {
+    background-color: rgb(0, 0, 0);
+    background-image: radial-gradient(
+        at 20% 0%,
+        rgb(127, 29, 29) 0,
+        transparent 40%
+      ),
+      radial-gradient(at 80% 0%, rgb(127, 29, 29) 0, transparent 40%),
+      radial-gradient(at 50% 0%, rgb(127, 29, 29) 0, transparent 31%);
+  }
+
+  .gradient-cp-cyan {
+    @apply bg-gradient-to-b from-black via-black to-cyan-900;
+  }
+
+  .gradient-cp-cyan-2 {
+    @apply bg-gradient-to-r from-cp-cyan to-cyan-950;
+  }
+
+  .gradient-cp-cyan-bar {
+    @apply bg-gradient-to-r from-cyan-900 via-cp-cyan to-cyan-200;
+  }
+
+  .gradient-cp-red-bar {
+    @apply bg-gradient-to-r from-cp-red via-red-700 to-red-900;
+  }
+}
