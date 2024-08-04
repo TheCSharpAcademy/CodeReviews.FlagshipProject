@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, ReactNode } from "react";
 import { createPortal } from "react-dom";
 import ModalBackdrop from "./ModalBackdrop";
 import { motion } from "framer-motion";
@@ -12,7 +12,7 @@ const Modal = ({
   isOpen,
   className,
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
   isOpen: boolean;
   className: ClassValue[];
 }) => {

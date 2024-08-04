@@ -1,12 +1,13 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
+import { TypedUseSelectorHook, useSelector } from "react-redux";
+import authReducer from "@/src/redux/slices/userSlice";
+import achievementsReducer from "@/src/redux/slices/achievementsSlice";
+import userAchievementsReducer from "@/src/redux/slices/userAchievementsSlice";
+import missionsReducer from "@/src/redux/slices/missionsSlice";
+import selectedMissionReducer from "@/src/redux/slices/selectedMissionSlice";
 import storage from "redux-persist/lib/storage";
 import { persistReducer, persistStore } from "redux-persist";
 import thunk from "redux-thunk";
-
-import selectedMissionReducer from "./slices/selectedMissionSlice";
-import userReducer from "./slices/userSlice";
-import { TypedUseSelectorHook } from "react-redux";
-import { useSelector } from "react-redux";
 
 const persistConfig = {
   key: "root",
@@ -14,7 +15,10 @@ const persistConfig = {
 };
 
 const rootReducers = combineReducers({
-  userReducer,
+  authReducer,
+  achievementsReducer,
+  userAchievementsReducer,
+  missionsReducer,
   selectedMissionReducer,
 });
 

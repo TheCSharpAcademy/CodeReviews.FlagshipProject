@@ -1,10 +1,9 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { arcade } from "@/src/fonts";
 import { usePathname } from "next/navigation";
-import links from "@/src/data/nav-links";
+import links from "@/src/constants/nav-links";
 import clsx from "clsx";
 import UserBanner from "./UserBanner/UserBanner";
 import Logo from "./Logo";

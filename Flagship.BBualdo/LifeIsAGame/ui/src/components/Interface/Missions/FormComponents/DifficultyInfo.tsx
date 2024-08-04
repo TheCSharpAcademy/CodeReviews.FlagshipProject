@@ -1,31 +1,32 @@
 "use client";
 
-import { difficultyLevels } from "@/src/data/difficultyLevels";
+import { difficultyLevels } from "@/src/constants/difficultyLevels";
 import { FormField } from "@/src/shadcn/ui/form";
-import { MissionSchema } from "@/src/utils/types";
 import { useEffect } from "react";
 import { UseFormReturn } from "react-hook-form";
+import { z } from "zod";
+import addMissionFormSchema from "@/src/schemas/addMissionFormSchema";
 
 const DifficultyInfo = ({
   form,
   difficultyLevel,
   xp,
 }: {
-  form: UseFormReturn<MissionSchema>;
+  form: UseFormReturn<z.infer<typeof addMissionFormSchema>>;
   difficultyLevel: number;
   xp: number;
 }) => {
   const { setValue } = form;
 
   useEffect(() => {
-    setValue("xp", xp);
+    setValue("xpReward", xp);
   }, [setValue, xp]);
 
   return (
     <FormField
       control={form.control}
-      name="xp"
-      render={({ field }) => {
+      name="xpReward"
+      render={() => {
         return (
           <div className="flex items-stretch gap-1 xs:max-lg:flex-col">
             <div className="flex flex-1 flex-col gap-4 border-2 border-cp-cyan bg-black xs:p-4 lg:p-8">

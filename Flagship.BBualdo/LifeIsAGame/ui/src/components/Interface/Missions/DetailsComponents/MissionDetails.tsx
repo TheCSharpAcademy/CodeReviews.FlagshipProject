@@ -1,31 +1,37 @@
 "use client";
 
-import { toggleSubtaskComplition } from "@/src/redux/slices/userSlice";
 import { AppDispatch } from "@/src/redux/store";
 import { Checkbox } from "@/src/shadcn/ui/checkbox";
 import { Label } from "@/src/shadcn/ui/label";
-import { MissionSchema } from "@/src/utils/types";
 import clsx from "clsx";
 import { useDispatch } from "react-redux";
 import ProgressBar from "./ProgressBar";
 import EditMissionButton from "../EditMissionButton";
 import MissionButtons from "./MissionButtons";
+import IMission from "@/src/models/IMission";
+import { format } from "date-fns";
+import MissionsService from "@/src/services/MissionsService";
+import { toast } from "sonner";
+import { toggleSubtask } from "@/src/redux/slices/missionsSlice";
 
-const MissionDetails = ({
-  selectedMission,
-}: {
-  selectedMission: MissionSchema;
-}) => {
-  const { id, title, description, subtasks, creationDate, completionDate } =
+const MissionDetails = ({ selectedMission }: { selectedMission: IMission }) => {
+  const { id, title, description, subtasks, createdAt, completedAt } =
     selectedMission;
   const dispatch = useDispatch<AppDispatch>();
 
-  const missionCompleted = selectedMission.status === "completed";
+  const missionCompleted = selectedMission.isCompleted;
 
-  const handleSubtaskChange = (subtaskId: string) => {
-    if (!missionCompleted)
-      dispatch(toggleSubtaskComplition({ missionId: id, subtaskId }));
-  };
+  async function handleSubtaskChange(subtaskId: string) {
+    if (!missionCompleted) {
+      await MissionsService.toggleSubtask(subtaskId)
+        .then(() => {
+          dispatch(toggleSubtask({ missionId: id, subtaskId: subtaskId }));
+        })
+        .catch(() => {
+          toast.error("Toggling subtask failed!");
+        });
+    }
+  }
 
   return (
     <div className="flex h-full w-full flex-col xs:max-lg:mt-4">
@@ -40,14 +46,14 @@ const MissionDetails = ({
           <p className="text-sm text-light-silver">
             Created:{" "}
             <span className="font-bold uppercase text-cp-cyan">
-              {creationDate}
+              {format(new Date(createdAt), "dd-MM-yyyy")}
             </span>
           </p>
-          {completionDate && (
+          {completedAt && (
             <p className="text-sm text-light-silver">
               Completed:{" "}
               <span className="font-bold uppercase text-cp-green">
-                {completionDate}
+                {format(new Date(completedAt), "dd-MM-yyyy")}
               </span>
             </p>
           )}

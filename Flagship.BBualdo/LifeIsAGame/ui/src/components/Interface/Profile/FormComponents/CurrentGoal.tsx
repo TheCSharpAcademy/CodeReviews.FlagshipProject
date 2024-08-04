@@ -6,13 +6,14 @@ import {
   FormMessage,
 } from "@/src/shadcn/ui/form";
 import { Input } from "@/src/shadcn/ui/input";
-import { UserProfileEditType } from "@/src/utils/types";
 import { UseFormReturn } from "react-hook-form";
+import editProfileInfoSchema from "@/src/schemas/editProfileInfoSchema";
+import { z } from "zod";
 
 const CurrentGoal = ({
   form,
 }: {
-  form: UseFormReturn<UserProfileEditType>;
+  form: UseFormReturn<z.infer<typeof editProfileInfoSchema>>;
 }) => {
   return (
     <FormField

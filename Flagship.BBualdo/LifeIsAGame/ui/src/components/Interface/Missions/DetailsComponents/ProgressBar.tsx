@@ -1,12 +1,8 @@
-import { MissionSchema } from "@/src/utils/types";
+import IMission from "@/src/models/IMission";
 
-const ProgressBar = ({
-  selectedMission,
-}: {
-  selectedMission: MissionSchema;
-}) => {
+const ProgressBar = ({ selectedMission }: { selectedMission: IMission }) => {
   const completedSubtasks = selectedMission.subtasks.filter(
-    (subtask) => subtask.isCompleted === true,
+    (subtask) => subtask.isCompleted,
   );
   const progress = Math.ceil(
     (completedSubtasks.length / selectedMission.subtasks.length) * 100,

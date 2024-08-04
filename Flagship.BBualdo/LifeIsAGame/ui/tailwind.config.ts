@@ -1,9 +1,9 @@
-const plugin = require("tailwindcss/plugin");
+import plugin from "tailwindcss/plugin";
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   darkMode: ["class"],
-  content: ["./shadcn/**/*.{ts,tsx}", "./src/**/*.{js,ts,jsx,tsx,mdx}", ,],
+  content: ["./shadcn/**/*.{ts,tsx}", "./src/**/*.{js,ts,jsx,tsx,mdx}"],
   theme: {
     container: {
       center: true,

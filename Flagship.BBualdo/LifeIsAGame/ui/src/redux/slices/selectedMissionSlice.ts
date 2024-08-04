@@ -1,26 +1,27 @@
-import { MissionSchema } from "@/src/utils/types";
-import { PayloadAction, createSlice } from "@reduxjs/toolkit";
+import IMission from "@/src/models/IMission";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 type InitialState = {
-  selectedMission: MissionSchema | null;
+  selectedMission: IMission | null;
 };
 
 const initialState: InitialState = {
   selectedMission: null,
 };
 
-const selectedMission = createSlice({
+const selectedMissionSlice = createSlice({
   name: "selectedMission",
   initialState,
   reducers: {
-    setSelectedMission: (
-      state,
-      action: PayloadAction<MissionSchema | null>,
-    ) => {
+    setSelectedMission: (state, action: PayloadAction<IMission>) => {
       state.selectedMission = action.payload;
+    },
+    clearSelectedMission: (state) => {
+      state.selectedMission = null;
     },
   },
 });
 
-export const { setSelectedMission } = selectedMission.actions;
-export default selectedMission.reducer;
+export const { setSelectedMission, clearSelectedMission } =
+  selectedMissionSlice.actions;
+export default selectedMissionSlice.reducer;

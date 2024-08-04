@@ -7,10 +7,15 @@ import {
   FormMessage,
 } from "@/src/shadcn/ui/form";
 import { Textarea } from "@/src/shadcn/ui/textarea";
-import { MissionSchema } from "@/src/utils/types";
 import { UseFormReturn } from "react-hook-form";
+import { z } from "zod";
+import combinedMissionFormSchema from "@/src/schemas/combinedMissionFormSchema";
 
-const Description = ({ form }: { form: UseFormReturn<MissionSchema> }) => {
+const Description = ({
+  form,
+}: {
+  form: UseFormReturn<z.infer<typeof combinedMissionFormSchema>>;
+}) => {
   return (
     <FormField
       control={form.control}

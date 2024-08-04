@@ -4,15 +4,27 @@ import { fadeIn } from "@/src/utils/fadeIn";
 import { motion } from "framer-motion";
 import Achievement from "./Achievement";
 import AchievementsStats from "./AchievementsStats";
-import { useAppSelector } from "@/src/redux/store";
+import useAchievements from "@/src/utils/hooks/useAchievements";
+import Loading from "@/src/app/loading";
+import IUserAchievement from "@/src/models/IUserAchievement";
 
 const AchievementsContainer = () => {
-  const achievements = useAppSelector(
-    (state) => state.userReducer.achievements,
+  const { achievements, userAchievements, isLoadingAchievements } =
+    useAchievements();
+
+  if (isLoadingAchievements) return <Loading text="Loading Achievements..." />;
+  if (!achievements || !userAchievements) return null;
+
+  const userAchievementsMap = new Map<string, IUserAchievement>(
+    userAchievements.map((ua) => [ua.achievementId, ua]),
   );
 
   const achievementsList = achievements.map((achievement) => (
-    <Achievement key={achievement.id} achievement={achievement} />
+    <Achievement
+      key={achievement.id}
+      achievement={achievement}
+      userAchievements={userAchievementsMap}
+    />
   ));
 
   return (
@@ -23,7 +35,12 @@ const AchievementsContainer = () => {
       viewport={{ once: true }}
       className="relative flex w-full flex-col items-center overflow-y-auto bg-transparent xs:gap-10 xs:p-2 xs:max-lg:pb-[130px] lg:gap-20 lg:p-10"
     >
-      <AchievementsStats />
+      {achievements && userAchievements && (
+        <AchievementsStats
+          achievements={achievements}
+          userAchievements={userAchievementsMap}
+        />
+      )}
       <div className="flex w-full flex-col">{achievementsList}</div>
     </motion.section>
   );

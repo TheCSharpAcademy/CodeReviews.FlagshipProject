@@ -17,10 +17,16 @@ import { Input } from "@/src/shadcn/ui/input";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { loginFormSchema } from "@/src/utils/schemas";
+import loginFormSchema from "@/src/schemas/loginFormSchema";
+import ILoginData from "@/src/models/ILoginData";
+import AuthService from "@/src/services/AuthService";
+import { toast } from "sonner";
+import { useState } from "react";
+import { Checkbox } from "@/src/shadcn/ui/checkbox";
+import { Label } from "@/src/shadcn/ui/label";
 
-// Login Component
 const LoginForm = () => {
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const router = useRouter();
 
   const loginForm = useForm<z.infer<typeof loginFormSchema>>({
@@ -28,11 +34,33 @@ const LoginForm = () => {
     defaultValues: {
       email: "",
       password: "",
+      rememberMe: false,
     },
   });
 
-  function onSubmit(values: z.infer<typeof loginFormSchema>) {
-    router.push("/");
+  async function onSubmit(values: z.infer<typeof loginFormSchema>) {
+    if (isLoading) return;
+    const loginData: ILoginData = { ...values };
+    try {
+      setIsLoading(true);
+      await AuthService.login(loginData);
+      router.push("/");
+      setIsLoading(false);
+    } catch (error: any) {
+      setIsLoading(false);
+      if (error.response) {
+        toast.error(error.response.data.message, {
+          description: error.response.data.errors.map(
+            (e: string, index: number) => <p key={index}>{e}</p>,
+          ),
+        });
+      } else {
+        toast.error("Login failed!", {
+          description:
+            "Server error occurred. Please try again later or contact customer support.",
+        });
+      }
+    }
   }
 
   return (
@@ -72,13 +100,15 @@ const LoginForm = () => {
                   <FormLabel className="tracking-[6px] text-white">
                     PASSWORD
                   </FormLabel>
-                  <button
-                    tabIndex={-1}
-                    type="button"
-                    className="text-xs text-cp-cyan"
-                  >
-                    DON'T REMEMBER?
-                  </button>
+                  <Link tabIndex={-1} href={"/forgot-password"}>
+                    <button
+                      tabIndex={-1}
+                      type="button"
+                      className="text-xs text-cp-cyan transition-all duration-200 hover:text-cp-yellow"
+                    >
+                      DON'T REMEMBER?
+                    </button>
+                  </Link>
                 </div>
                 <FormControl>
                   <Input className="min-w-[360px]" type="password" {...field} />
@@ -87,20 +117,47 @@ const LoginForm = () => {
               </FormItem>
             )}
           />
+          <FormField
+            control={loginForm.control}
+            name="rememberMe"
+            render={({ field }) => (
+              <FormItem className="flex w-full items-center gap-2">
+                <FormControl>
+                  <Checkbox
+                    id="rememberMe"
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                    className="scale-75"
+                  />
+                </FormControl>
+                <Label
+                  htmlFor="rememberMe"
+                  className="!mt-0 cursor-pointer uppercase text-cp-cyan"
+                >
+                  Remember Me
+                </Label>
+              </FormItem>
+            )}
+          />
           <button
+            disabled={isLoading}
             type="submit"
-            className="btn btn-cyan hover:btn-red hover:bg-cp-red/30"
+            className="btn btn-cyan enabled:hover:btn-red enabled:hover:bg-cp-red/30"
           >
-            Log in
+            {isLoading ? "Hacking..." : "Log in"}
           </button>
           <div className="relative mt-3 flex w-full items-center justify-center border">
             <span className="absolute -top-2 text-xs uppercase text-cp-yellow backdrop-blur-sm">
               Are you new here?
             </span>
           </div>
-          <Link href="/signup">
-            <button type="button" className="btn btn-yellow hover:bg-black">
-              Create account
+          <Link href={"/signup"}>
+            <button
+              disabled={isLoading}
+              type="button"
+              className="btn btn-yellow enabled:hover:bg-black"
+            >
+              {isLoading ? "Hacking..." : "Create Account"}
             </button>
           </Link>
         </form>

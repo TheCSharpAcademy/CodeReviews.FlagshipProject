@@ -2,7 +2,7 @@ import AchievementsBackdrop from "@/src/components/Interface/Achievements/Achiev
 import AchievementsContainer from "@/src/components/Interface/Achievements/AchievementsContainer";
 import BackButton from "@/src/components/Interface/shared/BackButton";
 
-export default function Achievements() {
+function Achievements() {
   return (
     <>
       <AchievementsBackdrop />
@@ -13,3 +13,5 @@ export default function Achievements() {
     </>
   );
 }
+
+export default Achievements;

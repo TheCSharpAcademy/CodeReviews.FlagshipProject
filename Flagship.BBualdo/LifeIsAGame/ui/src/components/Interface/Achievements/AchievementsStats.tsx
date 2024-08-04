@@ -1,34 +1,34 @@
-"use client";
+import IAchievement from "@/src/models/IAchievement";
+import IUserAchievement from "@/src/models/IUserAchievement";
 
-import { useAppSelector } from "@/src/redux/store";
-
-const AchievementsStats = () => {
-  const achievements = useAppSelector(
-    (state) => state.userReducer.achievements,
-  );
-
-  const completedAchievements = achievements.filter(
-    (achievement) => achievement.isUnlocked === true,
-  );
-
+const AchievementsStats = ({
+  achievements,
+  userAchievements,
+}: {
+  achievements: IAchievement[];
+  userAchievements: Map<string, IUserAchievement>;
+}) => {
   const progress = Math.floor(
-    (completedAchievements.length / achievements.length) * 100,
+    (userAchievements.size / achievements.length) * 100,
   );
 
   const calculateTotalXP = () => {
-    let xp = 0;
-    achievements.forEach((achievement) => {
-      xp += achievement.xp;
-    });
-    return xp;
+    return achievements.reduce(
+      (total, achievement) => (total += achievement.xpReward),
+      0,
+    );
   };
 
   const calculateGainedXP = () => {
-    let xp = 0;
-    completedAchievements.forEach((achievement) => {
-      xp += achievement.xp;
-    });
-    return xp;
+    return Array.from(userAchievements.values()).reduce(
+      (total, userAchievement) => {
+        const achievement = achievements.find(
+          (ach) => ach.id === userAchievement.achievementId,
+        );
+        return (total += achievement ? achievement.xpReward : 0);
+      },
+      0,
+    );
   };
 
   const calculateProgressColor = () => {
@@ -52,7 +52,7 @@ const AchievementsStats = () => {
           Completed:
         </h3>
         <p className="xs:text-xl lg:text-3xl">
-          {completedAchievements.length}/{achievements.length}
+          {userAchievements.size}/{achievements.length}
         </p>
       </div>
       <div className="flex items-center gap-2 xs:max-lg:hidden xs:max-lg:w-full xs:max-lg:justify-between lg:flex-col">

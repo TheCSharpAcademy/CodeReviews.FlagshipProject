@@ -10,12 +10,17 @@ import UserStats from "./UserStats";
 import UserBio from "./UserBio";
 import UserGoal from "./UserGoal";
 import EditProfileButton from "./EditProfileButton";
-import { useAppSelector } from "@/src/redux/store";
-import useAchievement from "@/src/utils/useAchievement";
+import useUser from "@/src/utils/hooks/useUser";
+import Loading from "@/src/app/loading";
+import useAchievementsUnlocker from "@/src/utils/hooks/useAchievementsUnlocker";
+import UserLinks from "@/src/components/Interface/Profile/UserLinks";
 
 const UserData = () => {
-  useAchievement();
-  const user = useAppSelector((state) => state.userReducer);
+  const { user, isLoadingUser } = useUser();
+  useAchievementsUnlocker();
+
+  if (isLoadingUser) return <Loading text="Loading User..." />;
+  if (!user) return null;
 
   return (
     <motion.section
@@ -41,6 +46,7 @@ const UserData = () => {
       <UserStats user={user} />
       <UserGoal user={user} />
       <UserBio user={user} />
+      <UserLinks user={user} />
     </motion.section>
   );
 };

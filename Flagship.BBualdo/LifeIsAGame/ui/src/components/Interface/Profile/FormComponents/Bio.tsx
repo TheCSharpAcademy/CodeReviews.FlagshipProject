@@ -6,10 +6,15 @@ import {
   FormMessage,
 } from "@/src/shadcn/ui/form";
 import { Textarea } from "@/src/shadcn/ui/textarea";
-import { UserProfileEditType } from "@/src/utils/types";
 import { UseFormReturn } from "react-hook-form";
+import editProfileInfoSchema from "@/src/schemas/editProfileInfoSchema";
+import { z } from "zod";
 
-const Bio = ({ form }: { form: UseFormReturn<UserProfileEditType> }) => {
+const Bio = ({
+  form,
+}: {
+  form: UseFormReturn<z.infer<typeof editProfileInfoSchema>>;
+}) => {
   return (
     <FormField
       control={form.control}

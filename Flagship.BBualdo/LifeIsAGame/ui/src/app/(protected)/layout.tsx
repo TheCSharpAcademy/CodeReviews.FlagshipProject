@@ -1,7 +1,5 @@
-export default function ProtectedLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+import { ReactNode } from "react";
+
+export default function ProtectedLayout({ children }: { children: ReactNode }) {
   return children;
 }

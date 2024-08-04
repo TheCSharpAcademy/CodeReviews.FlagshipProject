@@ -9,50 +9,32 @@ import CreateMissionButton from "./CreateMissionButton";
 import { AppDispatch, useAppSelector } from "@/src/redux/store";
 import MissionDetails from "./DetailsComponents/MissionDetails";
 import { useDispatch } from "react-redux";
-import { setSelectedMission } from "@/src/redux/slices/selectedMissionSlice";
 import MissionsEmpty from "../shared/MissionsEmpty";
-import { FaRegCheckCircle } from "react-icons/fa";
+import { FaPlus, FaRegCheckCircle } from "react-icons/fa";
 import { LuAlertCircle } from "react-icons/lu";
-import { FaPlus } from "react-icons/fa";
 import Modal from "../shared/Modal";
 import { IoClose } from "react-icons/io5";
-import useAchievement from "@/src/utils/useAchievement";
+import useMissions from "@/src/utils/hooks/useMissions";
+import Loading from "@/src/app/loading";
+import {
+  clearSelectedMission,
+  setSelectedMission,
+} from "@/src/redux/slices/selectedMissionSlice";
 
 const MissionsContainer = () => {
-  useAchievement();
-
+  const { missions, isLoadingMissions } = useMissions();
   const [missionsCategory, setMissionsCategory] = useState<
     "active" | "completed"
   >("active");
-
-  const missions = useAppSelector((state) => state.userReducer.missions);
+  const dispatch = useDispatch<AppDispatch>();
   const selectedMission = useAppSelector(
     (state) => state.selectedMissionReducer.selectedMission,
-  );
-
-  const dispatch = useDispatch<AppDispatch>();
-
-  const filteredMissions = missions
-    .filter((mission) => mission.status === missionsCategory)
-    .map((mission) => (
-      <Mission
-        mission={mission}
-        key={mission.id}
-        selectedMission={selectedMission!}
-      />
-    ));
-
-  const activeMissions = missions.filter(
-    (mission) => mission.status === "active",
-  );
-  const completedMissions = missions.filter(
-    (mission) => mission.status === "completed",
   );
 
   // If selected mission has been updated somehow (checking subtasks, editing) it will set that mission with changes as selected
   useEffect(() => {
     if (selectedMission) {
-      const updatedMission = missions.find(
+      const updatedMission = missions?.find(
         (mission) => mission.id === selectedMission.id,
       );
 
@@ -60,7 +42,26 @@ const MissionsContainer = () => {
         dispatch(setSelectedMission(updatedMission));
       }
     }
-  }, [missions, selectedMission]);
+  }, [missions, selectedMission, dispatch]);
+
+  if (isLoadingMissions) return <Loading text="Loading Missions..." />;
+  if (!missions) return null;
+
+  const activeMissions = missions.filter((mission) => !mission.isCompleted);
+  const completedMissions = missions.filter((mission) => mission.isCompleted);
+
+  const filteredMissions =
+    missionsCategory === "active"
+      ? missions.filter((m) => !m.isCompleted)
+      : missions.filter((m) => m.isCompleted);
+
+  const filteredMissionsElements = filteredMissions.map((mission) => (
+    <Mission
+      mission={mission}
+      key={mission.id}
+      selectedMission={selectedMission!}
+    />
+  ));
 
   return (
     <>
@@ -74,7 +75,7 @@ const MissionsContainer = () => {
         <button
           onClick={() => {
             setMissionsCategory("active");
-            dispatch(setSelectedMission(null));
+            dispatch(clearSelectedMission());
           }}
           className={clsx(
             "flex items-center gap-2 border-x-2 border-t-2 border-cp-red px-6 py-2 text-3xl text-cp-cyan transition-all duration-200 hover:bg-cp-cyan/30",
@@ -87,7 +88,7 @@ const MissionsContainer = () => {
         <button
           onClick={() => {
             setMissionsCategory("completed");
-            dispatch(setSelectedMission(null));
+            dispatch(clearSelectedMission());
           }}
           className={clsx(
             "flex items-center gap-2 border-x-2 border-t-2 border-x-cp-red border-t-cp-red px-6 py-2 text-3xl text-cp-red transition-all duration-200 hover:bg-cp-cyan/30",
@@ -118,7 +119,7 @@ const MissionsContainer = () => {
       >
         <div className="flex max-h-full flex-col gap-1 overflow-y-auto xs:w-full lg:w-[500px] lg:pr-4">
           {filteredMissions.length > 0 ? (
-            filteredMissions
+            filteredMissionsElements
           ) : (
             <MissionsEmpty className="absolute left-0 top-0 flex h-full w-full flex-col items-center justify-center gap-6 p-2">
               {missionsCategory === "active" ? (
@@ -159,7 +160,7 @@ const MissionsContainer = () => {
           <div className="flex w-full items-center justify-between border-b border-cp-yellow">
             <h2 className="text-xl text-cp-yellow">Mission Details</h2>
             <IoClose
-              onClick={() => dispatch(setSelectedMission(null))}
+              onClick={() => dispatch(clearSelectedMission())}
               className="cursor-pointer text-3xl text-cp-yellow transition-all duration-200 hover:text-cp-red-hover"
             />
           </div>

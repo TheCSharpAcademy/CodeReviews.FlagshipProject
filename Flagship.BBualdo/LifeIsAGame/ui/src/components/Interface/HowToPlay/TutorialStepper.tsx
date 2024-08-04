@@ -9,10 +9,8 @@ import Step2 from "./Step2";
 import Step3 from "./Step3";
 import Step4 from "./Step4";
 import FinalStep from "./FinalStep";
-import { useDispatch } from "react-redux";
-import useAchievement from "@/src/utils/useAchievement";
-import { completeTutorial } from "@/src/redux/slices/userSlice";
-import { AppDispatch } from "@/src/redux/store";
+import useAchievementsUnlocker from "@/src/utils/hooks/useAchievementsUnlocker";
+import ACHIEVEMENT_KEYS from "@/src/constants/achievements";
 
 const TutorialStepper = ({
   isOpen,
@@ -21,12 +19,12 @@ const TutorialStepper = ({
   isOpen: boolean;
   closeStepper: () => void;
 }) => {
-  useAchievement();
   const [currentStep, setCurrentStep] = useState(1);
-  const dispatch = useDispatch<AppDispatch>();
+  const { tryUnlockAchievement } = useAchievementsUnlocker();
 
-  const handleStepperDone = () => {
-    dispatch(completeTutorial());
+  const handleStepperDone = async () => {
+    await tryUnlockAchievement(ACHIEVEMENT_KEYS.COMPLETE_TUTORIAL);
+
     closeStepper();
     setCurrentStep(1);
   };

@@ -1,30 +1,29 @@
 "use client";
 
-import {
-  completeMission,
-  deleteMission,
-  unlockAchievement,
-} from "@/src/redux/slices/userSlice";
-import { setSelectedMission } from "@/src/redux/slices/selectedMissionSlice";
-import { AppDispatch, useAppSelector } from "@/src/redux/store";
-import { MissionSchema } from "@/src/utils/types";
+import { AppDispatch } from "@/src/redux/store";
 import { useDispatch } from "react-redux";
 import Modal from "../../shared/Modal";
 import { useState } from "react";
 import { IoClose } from "react-icons/io5";
-import { giveXP } from "@/src/redux/slices/userSlice";
 import { toast } from "sonner";
+import IMission from "@/src/models/IMission";
+import { clearSelectedMission } from "@/src/redux/slices/selectedMissionSlice";
+import MissionsService from "@/src/services/MissionsService";
+import {
+  completeMission,
+  deleteMission,
+} from "@/src/redux/slices/missionsSlice";
+import UserService from "@/src/services/UserService";
+import {
+  setUserMissionsCounters,
+  setUserXp,
+} from "@/src/redux/slices/userSlice";
+import useAchievementsUnlocker from "@/src/utils/hooks/useAchievementsUnlocker";
+import ACHIEVEMENT_KEYS from "@/src/constants/achievements";
 
-const MissionButtons = ({
-  selectedMission,
-}: {
-  selectedMission: MissionSchema;
-}) => {
+const MissionButtons = ({ selectedMission }: { selectedMission: IMission }) => {
   const dispatch = useDispatch<AppDispatch>();
-
-  const achievements = useAppSelector(
-    (state) => state.userReducer.achievements,
-  );
+  const { tryUnlockAchievement } = useAchievementsUnlocker();
 
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
@@ -36,43 +35,60 @@ const MissionButtons = ({
     setIsOpen(false);
   };
 
-  const incompletedSubtasks = selectedMission.subtasks.filter(
-    (subtask) => subtask.isCompleted === false,
+  const uncompletedSubtasks = selectedMission.subtasks.filter(
+    (subtask) => !subtask.isCompleted,
   );
 
-  const giveUpMission = () => {
-    if (
-      selectedMission.subtasks.some((subtask) => subtask.isCompleted === true)
-    ) {
-      const giveUpWithSubtaskCompleted = achievements.find(
-        (achievement) =>
-          achievement.requirements ===
-          "Give up a mission with at least one subtask completed.",
-      );
-      if (
-        giveUpWithSubtaskCompleted &&
-        !giveUpWithSubtaskCompleted.isUnlocked
-      ) {
-        dispatch(unlockAchievement(giveUpWithSubtaskCompleted));
-        toast(giveUpWithSubtaskCompleted.title, {
-          description: giveUpWithSubtaskCompleted.requirements,
-        });
-        dispatch(giveXP({ xp: giveUpWithSubtaskCompleted.xp }));
-      }
-    }
-    dispatch(deleteMission(selectedMission));
-    dispatch(setSelectedMission(null));
-    toast("Mission removed!");
-  };
+  async function giveUpMission() {
+    await MissionsService.deleteMission(selectedMission.id)
+      .then(() => {
+        if (selectedMission.subtasks.some((st) => st.isCompleted)) {
+          tryUnlockAchievement(ACHIEVEMENT_KEYS.GIVE_UP_WITH_SUBTASK);
+        }
+        dispatch(deleteMission({ missionId: selectedMission.id }));
+        dispatch(clearSelectedMission());
+        toast("Mission removed!");
+      })
+      .catch(() => {
+        toast.error("Mission deleting failed!");
+      });
 
-  const missionComplete = () => {
-    dispatch(completeMission(selectedMission));
-    dispatch(setSelectedMission(null));
-    dispatch(giveXP(selectedMission));
-    toast("Mission completed!", {
-      description: `You received ${selectedMission.xp}XP.`,
-    });
-  };
+    closeModal();
+  }
+
+  async function missionComplete() {
+    await MissionsService.completeMission(
+      selectedMission.id,
+      selectedMission.userId,
+    )
+      .then(async () => {
+        dispatch(completeMission({ missionId: selectedMission.id }));
+        dispatch(setUserMissionsCounters("COMPLETE_MISSION"));
+
+        await UserService.addXp(
+          selectedMission.userId,
+          selectedMission.xpReward,
+        )
+          .then((res) => {
+            dispatch(setUserXp(res.data));
+          })
+          .catch(() => {
+            toast.error(
+              "Adding XP failed! If you won't get it within 24 hours please contact our support.",
+            );
+          });
+
+        toast("Mission completed!", {
+          description: `You received ${selectedMission.xpReward}XP.`,
+        });
+      })
+      .catch(() => {
+        toast.error(
+          "Something went wrong! Please try again later or contact our support!",
+        );
+      });
+    dispatch(clearSelectedMission());
+  }
 
   return (
     <>
@@ -82,7 +98,7 @@ const MissionButtons = ({
         </button>
         <button
           onClick={missionComplete}
-          disabled={incompletedSubtasks.length !== 0}
+          disabled={uncompletedSubtasks.length !== 0}
           className="btn btn-green enabled:hover:bg-cp-green/50"
         >
           Complete Mission

@@ -2,7 +2,7 @@ import BackButton from "@/src/components/Interface/shared/BackButton";
 import UserData from "@/src/components/Interface/Profile/UserData";
 import ProfileBackdrop from "@/src/components/Interface/Profile/ProfileBackdrop";
 
-export default function Profile() {
+function Profile() {
   return (
     <>
       <ProfileBackdrop />
@@ -13,3 +13,5 @@ export default function Profile() {
     </>
   );
 }
+
+export default Profile;

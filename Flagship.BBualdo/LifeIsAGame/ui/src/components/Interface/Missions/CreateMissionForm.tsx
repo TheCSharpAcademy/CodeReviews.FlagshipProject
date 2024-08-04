@@ -10,34 +10,35 @@ import DifficultyPicker from "./FormComponents/DifficultyPicker";
 import SubtasksList from "./FormComponents/SubtasksList";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/src/redux/store";
-import { addMission } from "@/src/redux/slices/userSlice";
 import { v4 as uuidv4 } from "uuid";
-import { missionFormSchema } from "@/src/utils/schemas";
-import { setSelectedMission } from "@/src/redux/slices/selectedMissionSlice";
 import { toast } from "sonner";
-import { format } from "@/src/lib/utils";
+import useUser from "@/src/utils/hooks/useUser";
+import MissionsService from "@/src/services/MissionsService";
+import { addMission } from "@/src/redux/slices/missionsSlice";
+import { setSelectedMission } from "@/src/redux/slices/selectedMissionSlice";
+import addMissionFormSchema from "@/src/schemas/addMissionFormSchema";
+import { setUserMissionsCounters } from "@/src/redux/slices/userSlice";
+import useAchievementsUnlocker from "@/src/utils/hooks/useAchievementsUnlocker";
+import ACHIEVEMENT_KEYS from "@/src/constants/achievements";
 
 const CreateMissionForm = ({ closeModal }: { closeModal: () => void }) => {
+  const { user } = useUser();
   const dispatch = useDispatch<AppDispatch>();
+  const { tryUnlockAchievement } = useAchievementsUnlocker();
 
-  const date = new Date();
-
-  const form = useForm<z.infer<typeof missionFormSchema>>({
-    resolver: zodResolver(missionFormSchema),
+  const form = useForm<z.infer<typeof addMissionFormSchema>>({
+    resolver: zodResolver(addMissionFormSchema),
     defaultValues: {
-      id: uuidv4(),
-      status: "active",
       title: "",
       description: "",
-      difficulty: "Challenging",
-      xp: 150,
+      difficulty: 2,
+      xpReward: 150,
       subtasks: [],
-      creationDate: format(date),
-      completionDate: "",
+      userId: user?.id,
     },
   });
 
-  function onSubmit(values: z.infer<typeof missionFormSchema>) {
+  async function onSubmit(values: z.infer<typeof addMissionFormSchema>) {
     if (values.subtasks.length === 0) {
       values.subtasks.push({
         id: uuidv4(),
@@ -45,18 +46,33 @@ const CreateMissionForm = ({ closeModal }: { closeModal: () => void }) => {
         isCompleted: false,
       });
     }
-    dispatch(addMission(values));
-    dispatch(setSelectedMission(values));
-    toast("Mission has been added!");
+
+    await MissionsService.addMission(values)
+      .then(async (res) => {
+        dispatch(addMission(res.data));
+        dispatch(setUserMissionsCounters("ADD_MISSION"));
+        dispatch(setSelectedMission(res.data));
+
+        await tryUnlockAchievement(ACHIEVEMENT_KEYS.ADD_FIRST_MISSION);
+
+        toast("Mission has been added!");
+      })
+      .catch(() => {
+        toast.error("Adding mission failed!");
+      });
+
     closeModal();
   }
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="mt-4 space-y-4">
+        {/*@ts-ignore*/}
         <Title form={form} />
+        {/*@ts-ignore*/}
         <Description form={form} />
         <DifficultyPicker form={form} />
+        {/*@ts-ignore*/}
         <SubtasksList form={form} />
         <div className="flex items-center justify-center xs:gap-2 xs:max-lg:flex-col lg:gap-10">
           <button className="btn btn-yellow hover:bg-black">Create</button>

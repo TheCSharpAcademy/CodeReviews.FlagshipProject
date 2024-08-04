@@ -15,10 +15,15 @@ import { Input } from "@/src/shadcn/ui/input";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { signupFormSchema } from "@/src/utils/schemas";
+import signupFormSchema from "@/src/schemas/signUpFormSchema";
+import AuthService from "@/src/services/AuthService";
+import IRegisterData from "@/src/models/IRegisterData";
+import { toast } from "sonner";
+import { PiWarningCircleFill } from "react-icons/pi";
+import { useState } from "react";
 
-// Signup Component
 const SignupForm = () => {
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const router = useRouter();
 
   const signupForm = useForm<z.infer<typeof signupFormSchema>>({
@@ -31,12 +36,32 @@ const SignupForm = () => {
     },
   });
 
-  function onSubmit({
-    email,
-    password,
-    username,
-  }: z.infer<typeof signupFormSchema>) {
-    router.push("/");
+  async function onSubmit(values: z.infer<typeof signupFormSchema>) {
+    if (isLoading) return;
+    const registerData: IRegisterData = { ...values };
+    try {
+      setIsLoading(true);
+      await AuthService.register(registerData);
+      toast("Register successful!", {
+        description: "Now you can log in.",
+      });
+      router.push("/login");
+      setIsLoading(false);
+    } catch (error: any) {
+      setIsLoading(false);
+      if (error.response) {
+        toast.error(error.response.data.message, {
+          description: error.response.data.errors.map(
+            (e: string, index: number) => <p key={index}>{e}</p>,
+          ),
+        });
+      } else {
+        toast.error("Register failed!", {
+          description:
+            "Server error occurred. Please try again later or contact customer support.",
+        });
+      }
+    }
   }
 
   return (
@@ -113,10 +138,11 @@ const SignupForm = () => {
             )}
           />
           <button
+            disabled={isLoading}
             type="submit"
-            className="btn btn-cyan hover:btn-red hover:bg-cp-red/30"
+            className="btn btn-cyan enabled:hover:btn-red enabled:hover:bg-cp-red/30"
           >
-            Sign up
+            {isLoading ? "Hacking..." : "Sign up"}
           </button>
           <div className="relative mt-3 flex w-full items-center justify-center border">
             <span className="absolute -top-2 text-xs uppercase text-cp-yellow backdrop-blur-sm">
@@ -124,8 +150,12 @@ const SignupForm = () => {
             </span>
           </div>
           <Link href="/login">
-            <button type="button" className="btn btn-yellow hover:bg-black">
-              Log in
+            <button
+              disabled={isLoading}
+              type="button"
+              className="btn btn-yellow enabled:hover:bg-black"
+            >
+              {isLoading ? "Hacking..." : "Log in"}
             </button>
           </Link>
         </form>

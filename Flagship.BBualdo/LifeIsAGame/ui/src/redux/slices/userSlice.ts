@@ -1,202 +1,114 @@
-import achievements from "@/src/data/achievements";
-import levels from "@/src/data/levels";
-import { format } from "@/src/lib/utils";
-import {
-  AchievementType,
-  MissionSchema,
-  User,
-  UserProfileEditType,
-} from "@/src/utils/types";
-import { PayloadAction, createSlice } from "@reduxjs/toolkit";
+import IUser from "@/src/models/IUser";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import IUserXpResponse from "@/src/services/DTO/IUserXpResponse";
+import IEditProfileDto from "@/src/services/DTO/IEditProfileDto";
 
-const initialState: User = {
-  id: undefined,
-  avatar: "",
-  username: "",
-  email: "",
-  firstName: "",
-  lastName: undefined,
-  xpGained: 0,
-  currentGoal: undefined,
-  bio: undefined,
-  level: levels[0],
-  xp: 0,
-  achievements: achievements,
-  totalMissionsAdded: 0,
-  totalMissionsCompleted: 0,
-  missions: [],
-  hasCompletedTutorial: false,
+type InitialState = {
+  user: IUser | null | undefined;
+  isLoggedOut: boolean;
+};
+
+const initialState: InitialState = {
+  user: undefined,
+  isLoggedOut: true,
 };
 
 const userSlice = createSlice({
-  name: "user",
+  name: "auth",
   initialState,
   reducers: {
-    // Profile Reducers
-    createUser: (
-      state,
-      action: PayloadAction<{
-        id: string;
-        firstName: string;
-        lastName: string | undefined;
-        username: string;
-        currentGoal: string | undefined;
-      }>,
-    ) => {
-      const { id, firstName, lastName, username, currentGoal } = action.payload;
-
-      return { ...state, id, firstName, lastName, username, currentGoal };
+    setUser: (state, action: PayloadAction<IUser>) => {
+      state.user = action.payload;
     },
-    updateProfile: (state, action: PayloadAction<UserProfileEditType>) => {
-      const { firstName, lastName, username, currentGoal, bio } =
-        action.payload;
-      return { ...state, firstName, lastName, username, currentGoal, bio };
+    clearUser: (state) => {
+      state.user = null;
     },
-    updateAvatar: (state, action: PayloadAction<{ avatar: string }>) => {
-      const { avatar } = action.payload;
-      state.avatar = avatar;
+    setIsLoggedOut: (state, action: PayloadAction<boolean>) => {
+      state.isLoggedOut = action.payload;
     },
-
-    // XP Reducers
-    giveXP: (state, action: PayloadAction<{ xp: number }>) => {
-      const { xp } = action.payload;
-      const updatedXP = state.xp + xp;
-      state.xp = updatedXP;
-      state.xpGained = state.xpGained + xp;
-    },
-    levelUp: (state) => {
-      const nextLevelIndex = state.level.level;
-      const nextLevel = levels[nextLevelIndex];
-      if (nextLevel) {
-        state.xp = state.xp - state.level.ceil;
-        state.level = nextLevel;
+    setUserXp: (state, action: PayloadAction<IUserXpResponse>) => {
+      const { level, xp, totalXpGained } = action.payload;
+      if (state.user) {
+        state.user = { ...state.user, level, xp, totalXpGained };
       }
     },
-
-    // Achievement Reducers
-    unlockAchievement: (state, action: PayloadAction<AchievementType>) => {
-      const achievementToUnlock = action.payload;
-
-      if (!achievementToUnlock.isUnlocked) {
-        const updatedAchievement = {
-          ...achievementToUnlock,
-          isUnlocked: true,
-          unlockDate: format(new Date()),
+    setUserMissionsCounters: (state, action: PayloadAction<string>) => {
+      if (state.user) {
+        if (action.payload === "ADD_MISSION") state.user.totalMissionsAdded++;
+        if (action.payload === "COMPLETE_MISSION")
+          state.user.totalMissionsCompleted++;
+      }
+    },
+    updateUserInfo: (state, action: PayloadAction<IEditProfileDto>) => {
+      if (state.user) {
+        const { firstName, lastName, currentGoal, bio, username } =
+          action.payload;
+        state.user = {
+          ...state.user,
+          firstName,
+          lastName,
+          currentGoal,
+          bio,
+          username,
         };
-        const updatedAchievements = state.achievements.map((achievement) =>
-          achievement.id === updatedAchievement.id
-            ? updatedAchievement
-            : achievement,
-        );
-        state.achievements = updatedAchievements;
       }
     },
-
-    // Missions Schema
-    addMission: (state, action: PayloadAction<MissionSchema>) => {
-      state.missions.push(action.payload);
-      state.totalMissionsAdded = state.totalMissionsAdded + 1;
+    setUserAvatar: (state, action: PayloadAction<string>) => {
+      if (state.user) {
+        state.user.avatarUrl = action.payload;
+      }
     },
-    toggleSubtaskComplition: (
+    setUserProviderId: (
       state,
-      action: PayloadAction<{ missionId: string; subtaskId: string }>,
+      action: PayloadAction<"Github" | "Google" | "Facebook">,
     ) => {
-      const { missionId, subtaskId } = action.payload;
-      const mission = state.missions.find(
-        (mission) => mission.id === missionId,
-      );
+      if (state.user) {
+        const provider = action.payload;
 
-      if (mission) {
-        const updatedSubtasks = mission.subtasks.map((subtask) =>
-          subtask.id === subtaskId
-            ? { ...subtask, isCompleted: !subtask.isCompleted }
-            : subtask,
-        );
-        mission.subtasks = updatedSubtasks;
+        switch (provider) {
+          case "Github":
+            state.user.githubId = "secret";
+            break;
+          case "Facebook":
+            state.user.facebookId = "secret";
+            break;
+          case "Google":
+            state.user.googleId = "secret";
+            break;
+        }
       }
     },
-    updateMission: (state, action: PayloadAction<MissionSchema>) => {
-      const { id, title, description, subtasks } = action.payload;
-
-      const missionToUpdate = state.missions.find(
-        (mission) => mission.id === id,
-      );
-
-      if (missionToUpdate) {
-        const updatedMission = {
-          ...missionToUpdate,
-          title,
-          description,
-          subtasks,
-        };
-
-        const missionIndex = state.missions.findIndex(
-          (mission) => mission.id === id,
-        );
-
-        const updatedMissions = [...state.missions];
-        updatedMissions[missionIndex] = updatedMission;
-
-        state.missions = updatedMissions;
-      }
-    },
-    deleteMission: (state, action: PayloadAction<MissionSchema>) => {
-      const { id } = action.payload;
-
-      const missionToDelete = state.missions.find(
-        (mission) => mission.id === id,
-      );
-
-      if (missionToDelete) {
-        const filteredMissions = state.missions.filter(
-          (mission) => mission !== missionToDelete,
-        );
-
-        state.missions = filteredMissions;
-      }
-    },
-    completeMission: (state, action: PayloadAction<MissionSchema>) => {
-      const { id } = action.payload;
-
-      const missionToComplete = state.missions.find(
-        (mission) => mission.id === id,
-      );
-
-      if (missionToComplete) {
-        const updatedMissions = state.missions.map((mission) =>
-          mission.id === id
-            ? {
-                ...mission,
-                status: "completed" as const,
-                complitionDate: format(new Date()),
-              }
-            : mission,
-        );
-        state.missions = updatedMissions;
-        state.totalMissionsCompleted = state.totalMissionsCompleted + 1;
-      }
-    },
-    // Complete tutorial reducer
-    completeTutorial: (state) => {
-      if (!state.hasCompletedTutorial) {
-        state.hasCompletedTutorial = !state.hasCompletedTutorial;
+    clearUserProviderId: (
+      state,
+      action: PayloadAction<"Github" | "Google" | "Facebook">,
+    ) => {
+      if (state.user) {
+        const provider = action.payload;
+        switch (provider) {
+          case "Github":
+            state.user.githubId = undefined;
+            break;
+          case "Facebook":
+            state.user.facebookId = undefined;
+            break;
+          case "Google":
+            state.user.googleId = undefined;
+            break;
+        }
       }
     },
   },
 });
 
-export const {
-  createUser,
-  updateProfile,
-  updateAvatar,
-  giveXP,
-  levelUp,
-  unlockAchievement,
-  addMission,
-  completeMission,
-  toggleSubtaskComplition,
-  updateMission,
-  deleteMission,
-  completeTutorial,
-} = userSlice.actions;
 export default userSlice.reducer;
+export const {
+  setUser,
+  clearUser,
+  setIsLoggedOut,
+  setUserXp,
+  setUserMissionsCounters,
+  updateUserInfo,
+  setUserAvatar,
+  setUserProviderId,
+  clearUserProviderId,
+} = userSlice.actions;

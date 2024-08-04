@@ -1,11 +1,8 @@
 "use client";
 
-import useUser from "@/src/utils/useUser";
 import { motion } from "framer-motion";
 
 const Backdrop = () => {
-  useUser();
-
   return (
     <motion.video
       autoPlay

@@ -1,7 +1,7 @@
 import MissingData from "../shared/MissingData";
-import { User } from "@/src/utils/types";
+import IUser from "@/src/models/IUser";
 
-const UserGoal = ({ user }: { user: User }) => {
+const UserGoal = ({ user }: { user: IUser }) => {
   return (
     <div className="flex-1 border border-white p-2">
       <h2 className="lg:text-md uppercase text-white xs:text-sm">

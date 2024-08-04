@@ -1,27 +1,15 @@
-"use client";
+import IUser from "@/src/models/IUser";
 
-import { useAppSelector } from "@/src/redux/store";
-import { User } from "@/src/utils/types";
-
-const UserStats = ({ user }: { user: User }) => {
-  const missions = useAppSelector((state) => state.userReducer.missions);
-
-  const missionsCompleted = missions.filter(
-    (mission) => mission.status === "completed",
-  );
-  const missionsActive = missions.filter(
-    (missions) => missions.status === "active",
-  );
-
+const UserStats = ({ user }: { user: IUser }) => {
   return (
     <>
       <div className="flex">
         <div className="flex-1 border border-white p-2">
           <h2 className="lg:text-md uppercase text-white xs:text-sm">
-            Missions Active:
+            Missions Added:
           </h2>
           <h3 className="font-bold text-cp-red xs:text-xl lg:text-3xl">
-            {missionsActive.length}
+            {user.totalMissionsAdded}
           </h3>
         </div>
         <div className="flex-1 border border-white p-2">
@@ -29,7 +17,7 @@ const UserStats = ({ user }: { user: User }) => {
             Missions Completed:
           </h2>
           <h3 className="font-bold text-cp-red xs:text-xl lg:text-3xl">
-            {missionsCompleted.length}
+            {user.totalMissionsCompleted}
           </h3>
         </div>
 
@@ -38,7 +26,7 @@ const UserStats = ({ user }: { user: User }) => {
             Total XP Gained:
           </h2>
           <h3 className="font-bold text-cp-red xs:text-xl lg:text-3xl">
-            {user.xpGained}
+            {user.totalXpGained}
           </h3>
         </div>
       </div>

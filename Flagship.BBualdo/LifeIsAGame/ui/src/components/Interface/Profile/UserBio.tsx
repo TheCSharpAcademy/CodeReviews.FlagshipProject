@@ -1,7 +1,7 @@
-import { User } from "@/src/utils/types";
 import MissingData from "../shared/MissingData";
+import IUser from "@/src/models/IUser";
 
-const UserBio = ({ user }: { user: User }) => {
+const UserBio = ({ user }: { user: IUser }) => {
   return (
     <div className="mt-4 flex max-h-[200px] flex-col border border-white p-2">
       <h2 className="lg:text-md uppercase text-white xs:text-sm">Bio:</h2>

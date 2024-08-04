@@ -1,11 +1,11 @@
-import { User } from "@/src/utils/types";
 import clsx from "clsx";
+import IUser from "@/src/models/IUser";
 
 const UserDefaultAvatar = ({
   user,
   variant,
 }: {
-  user: User;
+  user: IUser;
   variant: "small" | "large";
 }) => {
   // splits username into words array to take initials from it

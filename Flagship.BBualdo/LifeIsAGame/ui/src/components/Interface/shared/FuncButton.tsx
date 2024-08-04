@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation";
 import CreateMissionButton from "../Missions/CreateMissionButton";
 import { FaPlus, FaUserEdit } from "react-icons/fa";
 import EditProfileButton from "../Profile/EditProfileButton";
-import AchievementsStatsCircle from "./AchievementsStatsCircle";
+import AchievementsStatsCircle from "../Achievements/AchievementsStatsCircle";
 
 const FuncButton = () => {
   const pathname = usePathname();

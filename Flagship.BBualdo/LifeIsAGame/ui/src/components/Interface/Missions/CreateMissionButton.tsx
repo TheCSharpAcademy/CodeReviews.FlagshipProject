@@ -2,7 +2,7 @@
 
 import { IoClose } from "react-icons/io5";
 import Modal from "../shared/Modal";
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 import CreateMissionForm from "./CreateMissionForm";
 import { ClassValue } from "clsx";
 import { cn } from "@/src/lib/utils";
@@ -11,7 +11,7 @@ const CreateMissionButton = ({
   children,
   className,
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
   className: ClassValue;
 }) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);

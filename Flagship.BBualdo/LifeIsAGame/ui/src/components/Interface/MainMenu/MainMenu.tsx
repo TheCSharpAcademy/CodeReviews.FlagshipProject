@@ -2,18 +2,26 @@
 
 import Link from "next/link";
 import MenuLogo from "../shared/MenuLogo";
-import links from "@/src/data/nav-links";
+import links from "@/src/constants/nav-links";
 import Backdrop from "./Backdrop";
-
 import { motion } from "framer-motion";
 import { fadeIn } from "@/src/utils/fadeIn";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import TutorialStepper from "../HowToPlay/TutorialStepper";
 import { GiPowerButton } from "react-icons/gi";
 import { useRouter } from "next/navigation";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "@/src/redux/store";
+import logout from "@/src/utils/logout";
+import useAchievementsUnlocker from "@/src/utils/hooks/useAchievementsUnlocker";
+import AuthService from "@/src/services/AuthService";
+import { setIsLoggedOut, setUser } from "@/src/redux/slices/userSlice";
 
 const MainMenu = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
+  const dispatch = useDispatch<AppDispatch>();
+  const router = useRouter();
+  useAchievementsUnlocker();
 
   const openModal = () => {
     setIsOpen(true);
@@ -24,7 +32,12 @@ const MainMenu = () => {
     document.body.style.overflow = "";
   };
 
-  const router = useRouter();
+  useEffect(() => {
+    AuthService.getCurrentUser().then((res) => {
+      dispatch(setUser(res.data));
+      dispatch(setIsLoggedOut(false));
+    });
+  }, []);
 
   const navLinks = links.map((link) => (
     <Link key={link.key} href={link.href}>
@@ -42,7 +55,7 @@ const MainMenu = () => {
       <Backdrop />
       <section className="xs:px-4 md:px-[120px]">
         <p className="absolute right-2 top-1 text-sm text-cp-red">
-          version: beta 0.5.0
+          version: 1.0.0
         </p>
         <MenuLogo />
         <motion.div
@@ -59,10 +72,9 @@ const MainMenu = () => {
             How to Play
           </button>
           {navLinks}
-          {/* TODO: Allow to log out when authentication will be implemented */}
-         <button
+          <button
             className="btn-menu flex items-center gap-2 text-cp-red enabled:hover:border-cp-red enabled:hover:text-cp-red-hover disabled:text-cp-red/50"
-            onClick={() => router.push("/login")}
+            onClick={async () => await logout(dispatch, router)}
           >
             <GiPowerButton />
             Logout

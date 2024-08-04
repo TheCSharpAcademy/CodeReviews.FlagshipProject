@@ -1,20 +1,14 @@
-"use client";
+import IUser from "@/src/models/IUser";
+import levels from "@/src/constants/levels";
 
-import { levelUp } from "@/src/redux/slices/userSlice";
-import { AppDispatch } from "@/src/redux/store";
-import { User } from "@/src/utils/types";
-import { useDispatch } from "react-redux";
-
-const UserXP = ({ user }: { user: User }) => {
+const UserXP = ({ user }: { user: IUser }) => {
   const { xp, level } = user;
-  const dispatch = useDispatch<AppDispatch>();
 
   const calculateProgress = () => {
-    let progress = (xp / level.ceil) * 100;
+    let progress = (xp / levels[level - 1].ceil) * 100;
 
     if (progress >= 100) {
-      dispatch(levelUp());
-      progress = (xp / level.ceil) * 100;
+      progress = (xp / levels[level - 1].ceil) * 100;
     }
 
     return progress;
@@ -25,14 +19,12 @@ const UserXP = ({ user }: { user: User }) => {
       <div className="flex w-full items-end justify-between text-cp-red">
         <p className="xs:text-xl lg:text-2xl">
           Level:{" "}
-          <span className="font-bold xs:text-2xl lg:text-4xl">
-            {level.level}
-          </span>
+          <span className="font-bold xs:text-2xl lg:text-4xl">{level}</span>
         </p>
         <p className="xs:text-lg lg:text-xl">
           XP:{" "}
           <span className="font-bold">
-            {xp}/{level.ceil}
+            {xp}/{levels[level - 1].ceil}
           </span>
         </p>
       </div>

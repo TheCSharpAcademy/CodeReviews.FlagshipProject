@@ -2,7 +2,7 @@ import MissionsBackdrop from "@/src/components/Interface/Missions/MissionsBackdr
 import MissionsContainer from "@/src/components/Interface/Missions/MissionsContainer";
 import BackButton from "@/src/components/Interface/shared/BackButton";
 
-export default function Missions() {
+function Missions() {
   return (
     <>
       <MissionsBackdrop />
@@ -13,3 +13,5 @@ export default function Missions() {
     </>
   );
 }
+
+export default Missions;

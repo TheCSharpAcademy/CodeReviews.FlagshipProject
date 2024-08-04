@@ -32,7 +32,7 @@ const ChangeAvatarButton = () => {
             className="cursor-pointer text-3xl text-cp-cyan transition-all duration-200 hover:text-cp-red-hover"
           />
         </div>
-        <AvatarPicker />
+        <AvatarPicker closeModal={closeModal} />
         <div className="flex w-full items-center justify-center">
           <button
             onClick={closeModal}

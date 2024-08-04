@@ -27,7 +27,7 @@ const Step1 = ({ currentStep }: { currentStep: number }) => {
           </h2>
           <p className="text-center font-bold text-cp-red xs:text-lg lg:w-1/2 lg:text-xl">
             Here you can bring your life skills to new levels (literally) by
-            compliting missions given to you by yourself!
+            completing missions given to you by yourself!
           </p>
           <p className="text-center font-bold text-white xs:text-lg lg:w-1/2 lg:text-xl">
             This module will show you what to do to get started.
