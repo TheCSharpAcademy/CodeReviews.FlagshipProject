@@ -2,11 +2,6 @@
 
 Life is a Game is an application where users can set missions for themselves, track their progress, and earn XP and levels based on the mission's difficulty level. The app also features a built-in achievement system.
 
-## In progress
-- [ ] Handling token expiration
-- [ ] Introducing Azure Functions
-- [ ] Configuring app on Azure
-
 ## Table of contents
 
 - [Overview](#overview)
@@ -14,13 +9,14 @@ Life is a Game is an application where users can set missions for themselves, tr
     - [Features](#-features)
 - [My process](#my-process)
     - [Backend implementation](#backend-implementation)
-      - [Authorization and Authentication](#authorization-and-authentication)
-      - [CRUD Operations](#crud-operations)
-      - [External Auth](#external-auth)
-      - [Logging and Unit Testing](#logging-and-unit-testing)
-      - [Code cleanup](#code-cleanup)
+        - [Authorization and Authentication](#authorization-and-authentication)
+        - [CRUD Operations](#crud-operations)
+        - [External Auth](#external-auth)
+        - [Logging and Unit Testing](#logging-and-unit-testing)
+        - [Code cleanup](#code-cleanup)
     - [Built with](#-built-with)
     - [What I have learned](#what-i-have-learned)
+    - [Areas to improve](#areas-to-improve)
     - [Useful resources](#useful-resources)
 - [Author](#author)
 
@@ -80,10 +76,10 @@ Life is a Game is an application where users can set missions for themselves, tr
 #### CRUD Operations
 14. Updated User to store external providers IDs and deleted **is_unlocked** row from **UserAchievements** table, because record presence is already a sign that achievement is unlocked.
 15. Created ```AchievementsRepository```, ```AchievementsService``` and ```AchievementsController``` to get all achievements as well as those unlocked by user, and to unlock specific achievement.
-16. Refactored frontend for handling achievements from database. When user logs in and goes into **Achievements** page, React ```useAchievements``` custom hook is calling ```AchievementsService``` for fetching fresh **Achievements** and **UserAchievements** data, saves them in **Redux** state, which is also saved in localStorage. I have mapped **UserAchievements** to JS Map for faster unlocked achievements searching. Then achievements are compared to user achievements to determine, which are unlocked and when. 
+16. Refactored frontend for handling achievements from database. When user logs in and goes into **Achievements** page, React ```useAchievements``` custom hook is calling ```AchievementsService``` for fetching fresh **Achievements** and **UserAchievements** data, saves them in **Redux** state, which is also saved in localStorage. I have mapped **UserAchievements** to JS Map for faster unlocked achievements searching. Then achievements are compared to user achievements to determine, which are unlocked and when.
 17. Created Repository => Service => Controller for **Missions** management. First, I set up assigning missionId Foreign Key in Subtasks manually in Dto object, but then I have made some research about **EF Core Navigation Properties**, so I have added ```public Mission Mission { get; set; }``` into my Subtask Model class. Now it sets missionId automatically. However, I have problem when trying to update Mission with subtasks, probably because lack of subtask management layer, so that's what I was going to do.
 18. Assigned empty list to ```List<Subtask>``` in Mission model to avoid nullable checks.
-19. When updating mission, I had to insert login to manually determine which subtask exists in mission already, which one is new and which one is missing, so it can be removed. I decided to make subtask ID mandatory for creating new one to simplify the process. I'm going to use **uuid** in React to achieve this.  
+19. When updating mission, I had to insert login to manually determine which subtask exists in mission already, which one is new and which one is missing, so it can be removed. I decided to make subtask ID mandatory for creating new one to simplify the process. I'm going to use **uuid** in React to achieve this.
 20. Created TypeScript ```IMission``` and ```ISubtask``` models as well as DTOs for adding and updating missions purposes, and also ```MissionsService``` class with necessary methods and finally ```useMisssions``` hook to centralize missions data. Then I implemented Redux ```missionsSlice``` and ```selectedMissionSlice``` again. After reworking some variables, filtering and other code parts to fit fresh approach, I've successfully managed displaying missions with all details and selecting missions to work.
 21. Refactored ```CreateMissionForm``` and Zod Schema to fit current data expected and returned from API. Adding missions works.
 22. Meanwhile, I found out that despite token being present in cookies it can be expired which prevents user from performing authorized operation. Have to keep this in mind and introduce refreshing tokens.
@@ -115,7 +111,7 @@ Life is a Game is an application where users can set missions for themselves, tr
 43. In callback page I check for ```code``` in query parameters. If there is no code included, user is redirected to the ```/login``` page. Otherwise, application sends that code to ```/auth/login-with-github``` endpoint. In the following ```AuthController``` method I create new client with ```IHttpClientFactory``` and pass it with received code to service method. ```IAuthService``` is responsible for exchanging code for token and ```IGithubService``` for getting user data and emails (Github requires separate request for user emails if it's not public). Then I check if user with specified email already exists. If true, I check assign ```GithubId``` to his account and log-in, else I create new user and do the same.
 44. Added ability to unlink account from Github and fixed problem with linking logging in with that account again. I had to create separate if statement when user is already in Database and after checking his Github ID - log him in.
 45. Refactored ```AuthService``` ```LoginWithGithubAsync``` method to ```LoginOrLinkWithGithubAsync``` which now additionally accepts userId as optional parameter. If userId is provided, that means user is logged in already and only wants to link his account with Github. Otherwise, it means user is not logged in and want to perform logging in with Github and optionally linking if not linked already. That was a challenge actually, had to take paper and pen and draw that schema to see, which code can be reused to follow ```DRY``` principle. I also had to modify ```github-callback``` page to check if user is already logged in to perform linking action, and also I had to check if Github account which user wants to link his profile with is already assigned to one.
-46. Moving to the Facebook, I created my application on ```Meta for Developers``` platform. Remaining steps were almost the same, but it forced me to all External Auth Services have ```ExchangeCodeForTokenAsync``` method, because there was too many significant differences to handle in reusable method. I also had to assign email as username for new user, because Facebook doesn't have username. 
+46. Moving to the Facebook, I created my application on ```Meta for Developers``` platform. Remaining steps were almost the same, but it forced me to all External Auth Services have ```ExchangeCodeForTokenAsync``` method, because there was too many significant differences to handle in reusable method. I also had to assign email as username for new user, because Facebook doesn't have username.
 47. Moving to Google, I've made the same steps - created app on ```GCP```, handling frontend requests and responses, creating additional controller endpoint, service and handling user logging in and linking/unlinking account with Google.
 48. A problem occured when trying to create account based on email from external provider. I forgot to invoke ```UserManager.CreateAsync()``` method. Now it's fixed and good to go.
 49. Added ability to update Username with other profile details.
@@ -143,6 +139,7 @@ Life is a Game is an application where users can set missions for themselves, tr
 #### Further Development
 65. In ```useAchievementsUnlocker``` split useEffect to 3 UseEffects, one for each achievement category check. I need to think about dependencies in the array because up to now it caused those achievements unlock twice (probably because React doesn't catch up with Redux state updates).
 66. In ```EditProfileForm``` I used ```useWatch``` from **React-Hook-Form** ```useMemo``` to track if user changed any values in his profile info. If not, there is no need to perform any requests.
+67. Defined ```EnsureCreated``` EF method to be sure that Database is successfully created when application is started.
 
 ### 🧰 Built with
 
@@ -179,6 +176,11 @@ Life is a Game is an application where users can set missions for themselves, tr
 - Displaying code Unit Test coverage using **dotCover**.
 - Configuring **Azure Communication Service** and using it to send email to user.
 - Using React ```useMemo``` hook
+- Configuring ```Azure``` Web Services and SQL Database
+- Publishing API to ```Azure```
+
+### Areas to improve
+- I have to deepen knowledge about cookies handling, especially on the way Client => API => Next.js middleware, because when I successfully hosted API on Azure and Next.js app on Vercel, I couldn't get token in middleware. Locally it works, but in production it's just invisible, despite being present in set-cookie and cookies as well. This makes app not redirecting to Main Menu after successful authentication, because it's cookie based.
 
 ### Useful resources
 
