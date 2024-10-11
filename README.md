@@ -17,7 +17,7 @@ Patients can upload their radiological images to a preferred storage location on
 After uploading images, patients can log in to create new examination requests, submitting necessary details and image links.
 
 ***Payment Integration:*** 
-Patients are directed to a payment page to complete transactions for the examination services (I am not sure how can i handle this. Need some external payment service)
+Patients are directed to a payment page to complete transactions for the examination services.
 
 ***Doctor Review System:*** 
 Newly created examinations appear in the "Pending Examinations" section for doctors. Interested doctors can accept cases and change the status to "Under Review."
@@ -27,6 +27,16 @@ Doctors can download images, complete the review, and submit their reports withi
 
 ***Notification System:*** 
 Once the report is finalized, patients receive notifications via email or SMS, and the report is sent directly to their email address.
+
+***Client Side: Blazor***
+
+***Server Side:***
+
+    API for patients , doctors, authentication
+    
+***Cloud Services: Azure***
+
+***External Service: Stripe as payment gateway***
 
 ***Database Schema***
 The application utilizes the following key tables:
@@ -52,3 +62,5 @@ Tracks income details associated with examinations and doctor payments.
 Manages user authentication and roles within the application.
 
 ![flagship_1](https://github.com/user-attachments/assets/d94140ab-47f5-47a2-aebb-643002dbdc95)
+
+
