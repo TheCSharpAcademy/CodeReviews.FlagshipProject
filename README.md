@@ -29,11 +29,10 @@ Doctors can download images, complete the review, and submit their reports withi
 Once the report is finalized, patients receive notifications via email or SMS, and the report is sent directly to their email address.
 
 ***Client Side: Blazor***
-
-***Server Side:***
-
-    API for patients , doctors, authentication
+    Easier to use with md identity and external authentication templates
     
+***Mobile Client: Blazor hybrid***
+
 ***Cloud Services: Azure***
 
 ***External Service: Stripe as payment gateway***
