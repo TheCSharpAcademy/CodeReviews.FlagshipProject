@@ -29,7 +29,8 @@ Doctors can download images, complete the review, and submit their reports withi
 Once the report is finalized, patients receive notifications via email or SMS, and the report is sent directly to their email address.
 
 ***Client Side: Blazor***
-    Easier to use with md identity and external authentication templates
+
+    Easier to use with ms identity and external authentication templates
     
 ***Mobile Client: Blazor hybrid***
 
