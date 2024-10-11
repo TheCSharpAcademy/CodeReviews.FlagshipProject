@@ -20,7 +20,7 @@ After uploading images, patients can log in to create new examination requests, 
 Patients are directed to a payment page to complete transactions for the examination services.
 
 ***Doctor Review System:*** 
-Newly created examinations appear in the "Pending Examinations" section for doctors. Interested doctors can accept cases and change the status to "Under Review."
+Newly created examinations appear in the "Pending Examinations" section for doctors.
 
 ***Report Generation:*** 
 Doctors can download images, complete the review, and submit their reports within the system.
