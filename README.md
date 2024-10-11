@@ -59,7 +59,7 @@ Tracks income details associated with examinations and doctor payments.
 
 ***Users***
 
-Manages user authentication and roles within the application.
+Manages user authentication and roles within the application. This will be updated with msidentity tables.
 
 ![flagship_1](https://github.com/user-attachments/assets/d94140ab-47f5-47a2-aebb-643002dbdc95)
 
