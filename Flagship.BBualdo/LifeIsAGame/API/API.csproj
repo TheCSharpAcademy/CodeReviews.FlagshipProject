@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+      <UserSecretsId>78062137-07bb-4d5b-96dd-a5749a6d0af7</UserSecretsId>
+  </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Azure.Communication.Email" Version="1.1.0-beta.1" />
+        <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.7" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.7" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.7" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.7">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Microsoft.Extensions.Identity.Core" Version="8.0.7" />
+        <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.3" />
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Contracts\Contracts.csproj" />
+      <ProjectReference Include="..\Data\Data.csproj" />
+      <ProjectReference Include="..\Repository\Repository.csproj" />
+      <ProjectReference Include="..\Services\Services.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Controllers\" />
+    </ItemGroup>
+
+</Project>
